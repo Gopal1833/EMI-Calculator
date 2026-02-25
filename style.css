@@ -1,121 +1,606 @@
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Segoe UI',sans-serif;
+/* ============================================================
+   SMART LOAN EMI CALCULATOR — EXTERNAL STYLESHEET
+   Features: Modern UI, Glassmorphism, Gradients, Animations,
+             Flexbox Layout, Mobile Responsive Design
+   ============================================================ */
+
+/* ===== CSS Custom Properties (Design Tokens) ===== */
+:root {
+    /* Primary Gradient Colors */
+    --primary-start: #6366f1;
+    /* Indigo */
+    --primary-end: #8b5cf6;
+    /* Violet */
+    --accent: #a78bfa;
+    /* Light Violet */
+
+    /* Background */
+    --bg-dark: #0f0f1a;
+    /* Deep Navy */
+    --bg-card: rgba(255, 255, 255, 0.06);
+    /* Glassmorphism */
+    --bg-card-hover: rgba(255, 255, 255, 0.09);
+
+    /* Text Colors */
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+
+    /* Input / Form */
+    --input-bg: rgba(255, 255, 255, 0.07);
+    --input-border: rgba(255, 255, 255, 0.12);
+    --input-focus: #8b5cf6;
+
+    /* Result Card Accents */
+    --card-emi: #6366f1;
+    --card-total: #10b981;
+    --card-interest: #f59e0b;
+
+    /* Misc */
+    --border-radius: 16px;
+    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-body{
-background:linear-gradient(135deg,#667eea,#764ba2);
-min-height:100vh;
+/* ===== CSS Reset & Base ===== */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-/* FLEX LAYOUT */
-.container{
-min-height:100vh;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-padding:20px;
-gap:35px;  /* 🔥 FOOTER SPACE */
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
 }
 
-/* CARD */
-.card{
-width:100%;
-max-width:420px;
-padding:30px;
-border-radius:20px;
-background:rgba(255,255,255,0.15);
-backdrop-filter:blur(12px);
-box-shadow:0 8px 32px rgba(0,0,0,0.25);
-color:white;
-animation:fade 1s ease-in;
+body {
+    font-family: var(--font);
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
 }
 
-h1{
-text-align:center;
-margin-bottom:5px;
+/* ===== Animated Background Blobs ===== */
+/* Decorative gradient blobs that float behind the content */
+.bg-blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
 }
 
-.subtitle{
-text-align:center;
-color:#e2e8f0;
-margin-bottom:20px;
+.blob-1 {
+    width: 500px;
+    height: 500px;
+    background: var(--primary-start);
+    top: -150px;
+    left: -100px;
+    animation: blobFloat 12s ease-in-out infinite alternate;
 }
 
-.field{
-margin-bottom:15px;
+.blob-2 {
+    width: 400px;
+    height: 400px;
+    background: var(--primary-end);
+    bottom: -100px;
+    right: -80px;
+    animation: blobFloat 15s ease-in-out infinite alternate-reverse;
 }
 
-.field label{
-display:block;
-margin-bottom:5px;
-font-weight:600;
+.blob-3 {
+    width: 300px;
+    height: 300px;
+    background: var(--card-total);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: blobFloat 10s ease-in-out infinite alternate;
 }
 
-.field input{
-width:100%;
-padding:10px;
-border-radius:8px;
-border:none;
-outline:none;
-background:rgba(255,255,255,0.2);
-color:white;
+/* Blob floating animation keyframes */
+@keyframes blobFloat {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    50% {
+        transform: translate(30px, -20px) scale(1.05);
+    }
+
+    100% {
+        transform: translate(-20px, 15px) scale(0.95);
+    }
 }
 
-.field input::placeholder{
-color:#e2e8f0;
+/* ===== Main Container ===== */
+/* Centers content and constrains max-width */
+.container {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
 }
 
-.actions{
-display:flex;
-justify-content:center;
+/* ===== Header ===== */
+.header {
+    text-align: center;
+    padding: 10px 0;
 }
 
-button{
-padding:10px 20px;
-border:none;
-border-radius:8px;
-background:#4f46e5;
-color:white;
-font-size:16px;
-cursor:pointer;
-transition:0.3s;
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 12px;
 }
 
-button:hover{
-transform:scale(1.05);
-background:#4338ca;
+/* Animated logo icon */
+.logo-icon {
+    width: 42px;
+    height: 42px;
+    color: var(--accent);
+    animation: pulse 2s ease-in-out infinite;
 }
 
-.results{
-margin-top:20px;
-border-top:1px solid rgba(255,255,255,0.3);
-padding-top:15px;
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
 }
 
-.result-item{
-display:flex;
-justify-content:space-between;
-padding:8px 0;
-font-weight:bold;
+.header h1 {
+    font-size: 1.85rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary-start), var(--accent), var(--card-total));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
 }
 
-.attribution{
-color:white;
-font-size:14px;
-opacity:0.9;
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    font-weight: 400;
 }
 
-/* ANIMATION */
-@keyframes fade{
-from{opacity:0;transform:translateY(20px);}
-to{opacity:1;transform:translateY(0);}
+/* ===== Glassmorphism Card ===== */
+/* Shared glass-card styling for calculator and amortization sections */
+.calculator-card,
+.amortization-section {
+    background: var(--bg-card);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--input-border);
+    border-radius: var(--border-radius);
+    padding: 36px 32px;
+    box-shadow: var(--shadow);
+    transition: background var(--transition);
 }
 
-/* MOBILE */
-@media(max-width:480px){
-.card{padding:20px}
+.calculator-card:hover,
+.amortization-section:hover {
+    background: var(--bg-card-hover);
+}
+
+/* ===== Section Titles ===== */
+.section-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+}
+
+/* ===== Form Section ===== */
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Individual form field group */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 0.3px;
+}
+
+/* Shared input and select styles */
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 1rem;
+    font-family: var(--font);
+    color: var(--text-primary);
+    background: var(--input-bg);
+    border: 1.5px solid var(--input-border);
+    border-radius: 12px;
+    outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition);
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+/* Custom dropdown arrow for select */
+.form-group select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M1.5 5.5l6.5 6.5 6.5-6.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 14px;
+    padding-right: 40px;
+    cursor: pointer;
+}
+
+/* Native dropdown option styling — ensure readable text on white background */
+.form-group select option {
+    background: #ffffff;
+    color: #1e1e2e;
+    font-size: 1rem;
+    padding: 10px 14px;
+    font-family: var(--font);
+}
+
+/* Focus state for inputs */
+.form-group input:focus,
+.form-group select:focus {
+    border-color: var(--input-focus);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
+}
+
+/* Disabled input styling */
+.form-group input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* Helper / hint text below inputs */
+.helper-text {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Validation error styling — added via JS */
+.form-group input.error,
+.form-group select.error {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+.error-message {
+    font-size: 0.75rem;
+    color: #ef4444;
+    margin-top: 2px;
+}
+
+/* ===== Buttons ===== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 28px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: var(--font);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
+}
+
+.btn-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* Primary CTA button — gradient */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-start), var(--primary-end));
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.55);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Secondary button — outline style */
+.btn-secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1.5px solid var(--accent);
+    margin-top: 16px;
+}
+
+.btn-secondary:hover {
+    background: rgba(167, 139, 250, 0.12);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(167, 139, 250, 0.2);
+}
+
+.btn-secondary:active {
+    transform: translateY(0);
+}
+
+/* ===== Results Section ===== */
+.results-section {
+    margin-top: 36px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    animation: fadeSlideUp 0.5s ease-out;
+}
+
+/* Result cards — flexbox grid */
+.result-cards {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+/* Individual result card */
+.result-card {
+    flex: 1 1 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 24px 16px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.result-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+}
+
+.result-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+}
+
+.result-value {
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+/* Accent colors per card type */
+.card-emi .result-value {
+    color: var(--card-emi);
+}
+
+.card-total .result-value {
+    color: var(--card-total);
+}
+
+.card-interest .result-value {
+    color: var(--card-interest);
+}
+
+/* Top accent border per card */
+.card-emi {
+    border-top: 3px solid var(--card-emi);
+}
+
+.card-total {
+    border-top: 3px solid var(--card-total);
+}
+
+.card-interest {
+    border-top: 3px solid var(--card-interest);
+}
+
+/* ===== Amortization Table ===== */
+.table-wrapper {
+    overflow-x: auto;
+    /* Horizontal scroll on small screens */
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+}
+
+#amortizationTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    min-width: 520px;
+    /* Ensures readability on mobile */
+}
+
+#amortizationTable thead {
+    background: linear-gradient(135deg, var(--primary-start), var(--primary-end));
+}
+
+#amortizationTable th {
+    padding: 14px 16px;
+    text-align: right;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #fff;
+}
+
+#amortizationTable th:first-child {
+    text-align: center;
+    border-radius: 12px 0 0 0;
+}
+
+#amortizationTable th:last-child {
+    border-radius: 0 12px 0 0;
+}
+
+#amortizationTable td {
+    padding: 12px 16px;
+    text-align: right;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+    transition: background var(--transition);
+}
+
+#amortizationTable td:first-child {
+    text-align: center;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Zebra striping */
+#amortizationTable tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.025);
+}
+
+/* Row hover effect */
+#amortizationTable tbody tr:hover {
+    background: rgba(139, 92, 246, 0.08);
+}
+
+/* ===== Footer ===== */
+.footer {
+    text-align: center;
+    padding: 20px 0 0;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* ===== Utility: Hidden class ===== */
+.hidden {
+    display: none !important;
+}
+
+/* ===== Animations ===== */
+/* Fade + slide-up for results */
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Row entrance animation for amortization table */
+@keyframes fadeInRow {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+#amortizationTable tbody tr {
+    animation: fadeInRow 0.3s ease-out both;
+}
+
+/* ===== Responsive Design (Mobile-first breakpoints) ===== */
+
+/* Tablets & smaller desktops */
+@media (max-width: 768px) {
+    .container {
+        padding: 24px 16px 40px;
+    }
+
+    .header h1 {
+        font-size: 1.45rem;
+    }
+
+    .calculator-card,
+    .amortization-section {
+        padding: 24px 20px;
+    }
+
+    .result-cards {
+        flex-direction: column;
+    }
+
+    .result-card {
+        flex-basis: auto;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 1.2rem;
+    }
+
+    .logo {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .logo-icon {
+        width: 34px;
+        height: 34px;
+    }
+
+    .result-value {
+        font-size: 1.3rem;
+    }
+
+    .calculator-card,
+    .amortization-section {
+        padding: 20px 16px;
+    }
+
+    #amortizationTable {
+        font-size: 0.8rem;
+    }
+
+    #amortizationTable th,
+    #amortizationTable td {
+        padding: 10px 10px;
+    }
 }

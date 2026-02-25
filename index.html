@@ -1,62 +1,163 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>EMI Loan Calculator</title>
-  <link rel="stylesheet" href="style.css">
-  <!-- Simple, semantic EMI Calculator -->
+  <!-- Meta Tags for SEO and Responsiveness -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="Smart Loan EMI Calculator - Calculate your Monthly EMI, Total Payment and Total Interest for Home, Car, Education and Personal Loans." />
+  <title>Smart Loan EMI Calculator</title>
+
+  <!-- Google Font - Inter for modern typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
-  <main class="container">
-    <section class="card" role="region" aria-labelledby="title">
-      <header>
-        <h1 id="title">EMI Calculator</h1>
-        <p class="subtitle">Calculate monthly EMI, total payment and total interest</p>
-      </header>
 
-      <form id="emi-form" novalidate>
-        <div class="field">
-          <label for="principal">Loan Amount (Principal)</label>
-          <input id="principal" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g., 500000">
+  <!-- ===== Background Animated Blobs ===== -->
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+  <div class="bg-blob blob-3"></div>
+
+  <!-- ===== Main Container ===== -->
+  <div class="container">
+
+    <!-- ===== Header Section ===== -->
+    <header class="header">
+      <div class="logo">
+        <!-- Loan Icon SVG -->
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+        </svg>
+        <h1>Smart Loan EMI Calculator</h1>
+      </div>
+      <p class="subtitle">Plan your finances with precision — calculate EMI, total interest &amp; more.</p>
+    </header>
+
+    <!-- ===== Calculator Card ===== -->
+    <main class="calculator-card">
+
+      <!-- ===== Input Form Section ===== -->
+      <form id="emiForm" class="form-section" novalidate>
+        <h2 class="section-title">Loan Details</h2>
+
+        <!-- Loan Type Dropdown -->
+        <div class="form-group">
+          <label for="loanType">Loan Type</label>
+          <select id="loanType" required>
+            <option value="" disabled selected>— Select Loan Type —</option>
+            <option value="home">🏠 Home Loan</option>
+            <option value="car">🚗 Car Loan</option>
+            <option value="education">🎓 Education Loan</option>
+            <option value="personal">💳 Personal Loan</option>
+          </select>
         </div>
 
-        <div class="field">
-          <label for="annualRate">Annual Interest Rate (%)</label>
-          <input id="annualRate" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g., 7.5">
+        <!-- Loan Amount -->
+        <div class="form-group">
+          <label for="loanAmount">Loan Amount (₹)</label>
+          <input type="number" id="loanAmount" placeholder="e.g. 500000" min="1" required />
         </div>
 
-        <div class="field">
-          <label for="tenureYears">Loan Tenure (Years)</label>
-          <input id="tenureYears" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g., 10">
+        <!-- Interest Rate (Manual input) -->
+        <div class="form-group">
+          <label for="interestRate">Interest Rate (% per annum)</label>
+          <input type="number" id="interestRate" placeholder="e.g. 8.5" min="0.1" max="50" step="0.1" required />
         </div>
 
-        <div class="actions">
-          <button id="calculateBtn" type="submit">Calculate EMI</button>
+        <!-- Loan Tenure -->
+        <div class="form-group">
+          <label for="loanTenure">Loan Tenure (Years)</label>
+          <input type="number" id="loanTenure" placeholder="e.g. 5" min="1" max="30" required />
         </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="calculateBtn" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+            <rect x="4" y="2" width="16" height="20" rx="2" />
+            <line x1="8" y1="6" x2="16" y2="6" />
+            <line x1="8" y1="10" x2="16" y2="10" />
+            <line x1="8" y1="14" x2="12" y2="14" />
+          </svg>
+          Calculate EMI
+        </button>
       </form>
 
-      <div id="error" class="error" aria-live="polite"></div>
+      <!-- ===== Results Section (Hidden by default) ===== -->
+      <section id="resultsSection" class="results-section hidden">
+        <h2 class="section-title">EMI Summary</h2>
 
-      <section id="results" class="results" aria-live="polite" hidden>
-        <div class="result-item">
-          <span class="label">Monthly EMI</span>
-          <span id="monthlyEmi" class="value">-</span>
+        <!-- Result Cards Grid -->
+        <div class="result-cards">
+          <!-- Monthly EMI Card -->
+          <div class="result-card card-emi">
+            <span class="result-label">Monthly EMI</span>
+            <span id="monthlyEmi" class="result-value">—</span>
+          </div>
+          <!-- Total Payment Card -->
+          <div class="result-card card-total">
+            <span class="result-label">Total Payment</span>
+            <span id="totalPayment" class="result-value">—</span>
+          </div>
+          <!-- Total Interest Card -->
+          <div class="result-card card-interest">
+            <span class="result-label">Total Interest</span>
+            <span id="totalInterest" class="result-value">—</span>
+          </div>
         </div>
-        <div class="result-item">
-          <span class="label">Total Payment</span>
-          <span id="totalPayment" class="value">-</span>
-        </div>
-        <div class="result-item">
-          <span class="label">Total Interest</span>
-          <span id="totalInterest" class="value">-</span>
-        </div>
+
+        <!-- Download PDF Button -->
+        <button id="downloadBtn" class="btn btn-secondary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Download EMI Report (PDF)
+        </button>
       </section>
+    </main>
+
+    <!-- ===== Amortization Table Section (Hidden by default) ===== -->
+    <section id="amortizationSection" class="amortization-section hidden">
+      <h2 class="section-title">Loan Amortization Schedule</h2>
+      <div class="table-wrapper">
+        <table id="amortizationTable">
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>EMI (₹)</th>
+              <th>Principal (₹)</th>
+              <th>Interest (₹)</th>
+              <th>Balance (₹)</th>
+            </tr>
+          </thead>
+          <tbody id="amortizationBody">
+            <!-- Rows populated via JavaScript -->
+          </tbody>
+        </table>
+      </div>
     </section>
 
-    <footer class="attribution">© 2026 EMI Calculator | Made by Gopal Krishna</footer>
-  </main>
+    <!-- ===== Footer ===== -->
+    <footer class="footer">
+      <p>&copy; 2026 Smart Loan EMI Calculator.</p>
+    </footer>
+  </div>
 
+  <!-- jsPDF Library (CDN) for PDF Generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- jsPDF AutoTable Plugin for table rendering in PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- External JavaScript -->
   <script src="script.js"></script>
 </body>
+
 </html>
