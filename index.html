@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EMI Loan Calculator</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Simple, semantic EMI Calculator -->
+</head>
+<body>
+  <main class="container">
+    <section class="card" role="region" aria-labelledby="title">
+      <header>
+        <h1 id="title">EMI Calculator</h1>
+        <p class="subtitle">Calculate monthly EMI, total payment and total interest</p>
+      </header>
+
+      <form id="emi-form" novalidate>
+        <div class="field">
+          <label for="principal">Loan Amount (Principal)</label>
+          <input id="principal" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g., 500000">
+        </div>
+
+        <div class="field">
+          <label for="annualRate">Annual Interest Rate (%)</label>
+          <input id="annualRate" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g., 7.5">
+        </div>
+
+        <div class="field">
+          <label for="tenureYears">Loan Tenure (Years)</label>
+          <input id="tenureYears" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g., 10">
+        </div>
+
+        <div class="actions">
+          <button id="calculateBtn" type="submit">Calculate EMI</button>
+        </div>
+      </form>
+
+      <div id="error" class="error" aria-live="polite"></div>
+
+      <section id="results" class="results" aria-live="polite" hidden>
+        <div class="result-item">
+          <span class="label">Monthly EMI</span>
+          <span id="monthlyEmi" class="value">-</span>
+        </div>
+        <div class="result-item">
+          <span class="label">Total Payment</span>
+          <span id="totalPayment" class="value">-</span>
+        </div>
+        <div class="result-item">
+          <span class="label">Total Interest</span>
+          <span id="totalInterest" class="value">-</span>
+        </div>
+      </section>
+    </section>
+
+    <footer class="attribution">© 2026 EMI Calculator | Made by Gopal Krishna</footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
