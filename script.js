@@ -42,7 +42,6 @@ const totalInterestEl = document.getElementById("totalInterest");
 const downloadBtn = document.getElementById("downloadBtn");
 const amortizationSection = document.getElementById("amortizationSection");
 const amortizationBody = document.getElementById("amortizationBody");
-const themeToggle = document.getElementById("themeToggle");
 const tabNav = document.getElementById("tabNav");
 const addLoanBtn = document.getElementById("addLoanBtn");
 const compareBtn = document.getElementById("compareBtn");
@@ -63,39 +62,39 @@ const MAX_COMPARE_LOANS = 4;
 // SECTION A: THEME TOGGLE
 // ============================================================
 
-/**
- * Initializes theme from localStorage or defaults to dark.
- */
-function initTheme() {
-  const savedTheme = localStorage.getItem("emi-theme") || "dark";
-  document.documentElement.setAttribute("data-theme", savedTheme);
+// Initialize theme from localStorage or use system preference
+function initializeTheme() {
+  const savedTheme = localStorage.getItem("theme");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const theme = savedTheme || (prefersDark ? "dark" : "light");
+  
+  document.documentElement.setAttribute("data-theme", theme);
+  updateThemeToggleIcon(theme);
 }
 
-/**
- * Toggles between dark and light themes.
- */
-function toggleTheme() {
+// Update theme toggle icon based on current theme
+function updateThemeToggleIcon(theme) {
+  const themeToggle = document.getElementById("themeToggle");
+  if (theme === "dark") {
+    themeToggle.classList.add("dark-mode");
+  } else {
+    themeToggle.classList.remove("dark-mode");
+  }
+}
+
+// Theme toggle button handler
+document.getElementById("themeToggle").addEventListener("click", function () {
   const html = document.documentElement;
-  const current = html.getAttribute("data-theme");
-  const next = current === "dark" ? "light" : "dark";
-  html.setAttribute("data-theme", next);
-  localStorage.setItem("emi-theme", next);
-
-  // Re-render charts with new theme colors
-  if (lastCalculation) {
-    renderEmiCharts(lastCalculation);
-  }
-  // Re-render compare charts if visible
-  if (!compareResultsSection.classList.contains("hidden")) {
-    runComparison();
-  }
-}
+  const currentTheme = html.getAttribute("data-theme");
+  const newTheme = currentTheme === "dark" ? "light" : "dark";
+  
+  html.setAttribute("data-theme", newTheme);
+  localStorage.setItem("theme", newTheme);
+  updateThemeToggleIcon(newTheme);
+});
 
 // Initialize theme on page load
-initTheme();
-
-// Theme toggle event
-themeToggle.addEventListener("click", toggleTheme);
+initializeTheme();
 
 // ============================================================
 // SECTION B: TAB NAVIGATION
@@ -257,7 +256,7 @@ function renderEmiCharts(data) {
           labels: {
             color: textColor,
             padding: 16,
-            font: { family: "'Inter', sans-serif", size: 12, weight: 600 },
+            font: { family: "'Poppins', sans-serif", size: 12, weight: 600 },
             usePointStyle: true,
             pointStyleWidth: 12
           }
@@ -266,7 +265,7 @@ function renderEmiCharts(data) {
           display: true,
           text: "Principal vs Interest",
           color: textColor,
-          font: { family: "'Inter', sans-serif", size: 14, weight: 700 }
+          font: { family: "'Poppins', sans-serif", size: 14, weight: 700 }
         },
         tooltip: {
           callbacks: {
@@ -314,7 +313,7 @@ function renderEmiCharts(data) {
           labels: {
             color: textColor,
             padding: 16,
-            font: { family: "'Inter', sans-serif", size: 12, weight: 600 },
+            font: { family: "'Poppins', sans-serif", size: 12, weight: 600 },
             usePointStyle: true,
             pointStyleWidth: 12
           }
@@ -323,7 +322,7 @@ function renderEmiCharts(data) {
           display: true,
           text: "Payment Composition",
           color: textColor,
-          font: { family: "'Inter', sans-serif", size: 14, weight: 700 }
+          font: { family: "'Poppins', sans-serif", size: 14, weight: 700 }
         },
         tooltip: {
           callbacks: {
@@ -598,7 +597,7 @@ function renderCompareCharts(results) {
         legend: {
           labels: {
             color: textColor,
-            font: { family: "'Inter', sans-serif", size: 12, weight: 600 },
+            font: { family: "'Poppins', sans-serif", size: 12, weight: 600 },
             usePointStyle: true,
             pointStyleWidth: 12,
             padding: 16
@@ -608,7 +607,7 @@ function renderCompareCharts(results) {
           display: true,
           text: "Loan Amount Comparison",
           color: textColor,
-          font: { family: "'Inter', sans-serif", size: 16, weight: 700 },
+          font: { family: "'Poppins', sans-serif", size: 16, weight: 700 },
           padding: { bottom: 20 }
         },
         tooltip: {
@@ -670,7 +669,7 @@ function renderCompareCharts(results) {
           display: true,
           text: "Monthly EMI Comparison",
           color: textColor,
-          font: { family: "'Inter', sans-serif", size: 16, weight: 700 },
+          font: { family: "'Poppins', sans-serif", size: 16, weight: 700 },
           padding: { bottom: 20 }
         },
         tooltip: {
@@ -890,3 +889,182 @@ interestRateInput.addEventListener("input", function () {
 loanTenureInput.addEventListener("input", function () {
   clearError(loanTenureInput);
 });
+
+// ============================================================
+// SECTION I: SLIDER SYNC (Two-way binding)
+// ============================================================
+
+const loanAmountSlider = document.getElementById("loanAmountSlider");
+const interestRateSlider = document.getElementById("interestRateSlider");
+const loanTenureSlider = document.getElementById("loanTenureSlider");
+
+/**
+ * Updates the slider track fill color based on current value.
+ * Creates a gradient from start to thumb position, then gray after.
+ */
+function updateSliderFill(slider) {
+  const min = parseFloat(slider.min);
+  const max = parseFloat(slider.max);
+  const val = parseFloat(slider.value);
+  const percent = ((val - min) / (max - min)) * 100;
+  const styles = getComputedStyle(document.documentElement);
+  const startColor = styles.getPropertyValue("--btn-gradient-start").trim();
+  const endColor = styles.getPropertyValue("--btn-gradient-end").trim() || startColor;
+  const trackBg = styles.getPropertyValue("--input-border").trim();
+  slider.style.background =
+    "linear-gradient(to right, " + startColor + " 0%, " +
+    endColor + " " + percent + "%, " +
+    trackBg + " " + percent + "%)";
+}
+
+/**
+ * Syncs a range slider and its corresponding number input (two-way).
+ */
+function syncSliderToInput(slider, input) {
+  // Slider → Input
+  slider.addEventListener("input", function () {
+    input.value = slider.value;
+    updateSliderFill(slider);
+    clearError(input);
+  });
+
+  // Input → Slider
+  input.addEventListener("input", function () {
+    var val = parseFloat(input.value);
+    if (!isNaN(val)) {
+      var clamped = Math.min(Math.max(val, parseFloat(slider.min)), parseFloat(slider.max));
+      slider.value = clamped;
+      updateSliderFill(slider);
+    }
+  });
+
+  // Initial fill on page load
+  updateSliderFill(slider);
+}
+
+// Initialize all slider syncs
+syncSliderToInput(loanAmountSlider, loanAmountInput);
+syncSliderToInput(interestRateSlider, interestRateInput);
+syncSliderToInput(loanTenureSlider, loanTenureInput);
+
+// Light theme only — no theme toggle listener needed
+
+// ============================================================
+// SECTION J: PART PAYMENT CALCULATOR
+// ============================================================
+
+(function () {
+  var form = document.getElementById("partPayForm");
+  var sliders = {
+    ppOutstanding: document.getElementById("ppOutstandingSlider"),
+    ppRate: document.getElementById("ppRateSlider"),
+    ppTenure: document.getElementById("ppTenureSlider"),
+    ppPartAmount: document.getElementById("ppPartAmountSlider")
+  };
+
+  // Sync each slider
+  Object.keys(sliders).forEach(function (id) {
+    var input = document.getElementById(id);
+    var slider = sliders[id];
+    if (input && slider) syncSliderToInput(slider, input);
+  });
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var P = parseFloat(document.getElementById("ppOutstanding").value);
+    var R = parseFloat(document.getElementById("ppRate").value) / 12 / 100;
+    var N = parseInt(document.getElementById("ppTenure").value) * 12;
+    var part = parseFloat(document.getElementById("ppPartAmount").value) || 0;
+
+    if (isNaN(P) || P <= 0 || isNaN(R) || R <= 0 || isNaN(N) || N <= 0) return;
+
+    var emiBefore = calculateEMI(P, R, N);
+    var newP = P - part;
+    if (newP < 0) newP = 0;
+    var emiAfter = newP > 0 ? calculateEMI(newP, R, N) : 0;
+    var totalBefore = emiBefore * N;
+    var totalAfter = emiAfter * N + part;
+    var saving = totalBefore - totalAfter;
+
+    document.getElementById("ppEmiBefore").textContent = formatCurrency(emiBefore);
+    document.getElementById("ppEmiAfter").textContent = formatCurrency(emiAfter);
+    document.getElementById("ppSaving").textContent = formatCurrency(Math.max(saving, 0));
+    document.getElementById("ppResults").classList.remove("hidden");
+  });
+})();
+
+// ============================================================
+// SECTION K: BALANCE TRANSFER CALCULATOR
+// ============================================================
+
+(function () {
+  var form = document.getElementById("btForm");
+  var sliders = {
+    btOutstanding: document.getElementById("btOutstandingSlider"),
+    btCurrentRate: document.getElementById("btCurrentRateSlider"),
+    btNewRate: document.getElementById("btNewRateSlider"),
+    btTenure: document.getElementById("btTenureSlider")
+  };
+
+  Object.keys(sliders).forEach(function (id) {
+    var input = document.getElementById(id);
+    var slider = sliders[id];
+    if (input && slider) syncSliderToInput(slider, input);
+  });
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var P = parseFloat(document.getElementById("btOutstanding").value);
+    var R1 = parseFloat(document.getElementById("btCurrentRate").value) / 12 / 100;
+    var R2 = parseFloat(document.getElementById("btNewRate").value) / 12 / 100;
+    var N = parseInt(document.getElementById("btTenure").value) * 12;
+
+    if (isNaN(P) || P <= 0 || isNaN(R1) || R1 <= 0 || isNaN(R2) || R2 <= 0 || isNaN(N) || N <= 0) return;
+
+    var currentEmi = calculateEMI(P, R1, N);
+    var newEmi = calculateEMI(P, R2, N);
+    var saving = (currentEmi - newEmi) * N;
+
+    document.getElementById("btCurrentEmi").textContent = formatCurrency(currentEmi);
+    document.getElementById("btNewEmi").textContent = formatCurrency(newEmi);
+    document.getElementById("btSaving").textContent = formatCurrency(Math.max(saving, 0));
+    document.getElementById("btResults").classList.remove("hidden");
+  });
+})();
+
+// ============================================================
+// SECTION L: AREA CONVERSION CALCULATOR
+// ============================================================
+
+(function () {
+  // Conversion factors to sq meters
+  var toSqM = {
+    sqft: 0.092903,
+    sqm: 1,
+    sqyd: 0.836127,
+    acre: 4046.86,
+    hectare: 10000
+  };
+
+  var unitNames = {
+    sqft: "Square Feet (sq ft)",
+    sqm: "Square Meters (sq m)",
+    sqyd: "Square Yards (sq yd)",
+    acre: "Acres",
+    hectare: "Hectares"
+  };
+
+  document.getElementById("convertAreaBtn").addEventListener("click", function () {
+    var from = document.getElementById("areaFrom").value;
+    var to = document.getElementById("areaTo").value;
+    var val = parseFloat(document.getElementById("areaValue").value);
+    if (isNaN(val) || val < 0) return;
+
+    var inSqM = val * toSqM[from];
+    var result = inSqM / toSqM[to];
+
+    document.getElementById("areaFromText").textContent = val + " " + unitNames[from];
+    document.getElementById("areaToText").textContent = result.toFixed(4) + " " + unitNames[to];
+    document.getElementById("areaResult").classList.remove("hidden");
+  });
+})();
